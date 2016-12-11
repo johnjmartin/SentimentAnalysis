@@ -5,6 +5,7 @@
   * MyJob.jar
   * MyJob.java
   * README.md
+  
 ##Execution
 `./hadoop jar [path]/MyJob.jar /cisc432/negative.txt /cisc432/positive.txt /cisc432/data.txt [path]/final_output`
 ##MapReduce Programming & Development Process
