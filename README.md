@@ -5,9 +5,10 @@
   * MyJob.jar
   * MyJob.java
   * README.md
-  
+
 ##Execution
 `./hadoop jar [path]/MyJob.jar /cisc432/negative.txt /cisc432/positive.txt /cisc432/data.txt [path]/final_output`
+
 ##MapReduce Programming & Development Process
 My algorithm was to iterate over the bodies of every review for a product, matching each word to the provided list of positives and negatives. I kept a running counter starting at 0, adding 1 for each positive word matched, and subtracting 1 for each negative word. If there was more than one review for a product_id, I would carry over the value of the current count. This is essentially treats different reviews for a single product_id as one large review. I explain my thinking behind this later on. If after iterating through the whole review set the sum was > 0, = 0, or < 0 I decided the overall sentiment for the product was positive, neutral, or negative, respectively.
 
@@ -21,4 +22,4 @@ to view the output of just my mapper job. Once the mapper output was what I was 
 
 My reducer took the product_id, and a Text Iterator for the review bodies. Using the iterator, I processed each text body to remove any symbols that were not characters or whitespace, then I split the review by whitespace, and calculated the total number of positives and negatives in the review body. I outputted “Positive Sentiment”, “Neutral Sentiment”, or “Negative Sentiment” depending on the total number of sentiment related words in each review. If there was more than one review I treated them as one large review, carrying the total sentiment count forward through each review iteration. I considered treating each review as +1 for positive, -1 for negative, and outputting that value. But it made more sense to me to take to count the total number of positive and negative words in each review because in that case if someone feels overwhelmingly for or against the product it is shown in the total count of the review sentiment.
 
-Lastly, I definitely enjoyed this assignment the most. While I found MapReduce challenging to learn at first, things definitely speed up once you understand the basic structure of development. After seeing my final results, it’s clear how powerful MapReduce is for consuming, mutating, and analyzing large datasets. There were 1,431,031 different reviews in the dataset, the fact that it took less than 3 minutes to analyze and aggregate every review is very impressive and really shows the power of Hadoop.
+Lastly, my impression of MapReduce overall. While I found MapReduce challenging to learn at first, things definitely speed up once you understand the basic structure of development. After seeing my final results, it’s clear how powerful MapReduce is for consuming, mutating, and analyzing large datasets. There were 1,431,031 different reviews in the dataset, the fact that it took less than 3 minutes to analyze and aggregate every review is very impressive and really shows the power of Hadoop.
