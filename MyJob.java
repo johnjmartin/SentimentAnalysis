@@ -74,7 +74,7 @@ public class MyJob extends Configured implements Tool {
                            OutputCollector<Text, Text> output,
                            Reporter reporter) throws IOException {
             //Total sentiment words count
-			int count = 0;
+	    int count = 0;
             String[] csv;
             //Iterating over each review -- if more than one
             while (values.hasNext()) {
