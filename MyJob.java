@@ -40,23 +40,23 @@ import org.apache.hadoop.util.ToolRunner;
 public class MyJob extends Configured implements Tool {
 	public static Set<String> goodWords = new HashSet<String>();
 	public static Set<String> badWords = new HashSet<String>();
-    
+
     public static class MapClass extends MapReduceBase
         implements Mapper<LongWritable, Text, Text, Text> {
-    	
+
     	private Text product_id = new Text();
     	private Text body = new Text();
-    	
+
         public void map(LongWritable key, Text value,
                         OutputCollector<Text, Text> output,
                         Reporter reporter) throws IOException {
-        	String[] gas = value.toString().split("\t");
+        	String[] line = value.toString().split("\t");
         	//Initially had errors thrown when using larger data file beacuse some lines did not have 8 entries
         	//Checking length before accessing.. Also wrapped in a try/catch to be extra safe
-        	if (gas.length >= 8) {
+        	if (line.length >= 8) {
 	        	try {
-		        	body.set(gas[1]);
-		        	product_id.set(gas[7]);
+		        	body.set(line[1]);
+		        	product_id.set(line[7]);
 	        	} catch (Exception e){
 	        		System.err.println("Caught exception while parsing line of data (data is inconsistent)");
 	        	}
@@ -64,10 +64,10 @@ public class MyJob extends Configured implements Tool {
         	}
         }
     }
-    
+
     public static class Reduce extends MapReduceBase
         implements Reducer<Text, Text, Text, Text> {
-    	
+
         private Text result = new Text();
 
         public void reduce(Text key, Iterator<Text> values,
@@ -78,10 +78,10 @@ public class MyJob extends Configured implements Tool {
             String[] csv;
             //Iterating over each review -- if more than one
             while (values.hasNext()) {
-            	//remove all non whitespace and non characters from review body, split by spaces between words 
-	            csv = values.next().toString().replaceAll("[^\\p{L}\\p{Z}]","").split(" "); 
+            	//remove all non whitespace and non characters from review body, split by spaces between words
+	            csv = values.next().toString().replaceAll("[^\\p{L}\\p{Z}]","").split(" ");
                 for (String word : csv) {
-                	//Using HashSet because lookup is O(1) -- arraylist or similar is O(n) 
+                	//Using HashSet because lookup is O(1) -- arraylist or similar is O(n)
                 	if (goodWords.contains(word)) {
                 		count = count+1;
                 	}
@@ -91,7 +91,7 @@ public class MyJob extends Configured implements Tool {
                 }
             }
             if (count > 0) {
-                result.set("Positive Sentiment");            	
+                result.set("Positive Sentiment");
             }
             else if (count < 0) {
             	result.set("Negative Sentiment");
@@ -103,10 +103,10 @@ public class MyJob extends Configured implements Tool {
             output.collect(key, result);
         }
     }
-    
+
     public int run(String[] args) throws Exception {
         Configuration conf = getConf();
-        
+
         JobConf job = new JobConf(conf, MyJob.class);
     	positiveList(args[1]); //Path to positive words file
     	negativeList(args[0]); //Path to negative words file
@@ -114,20 +114,20 @@ public class MyJob extends Configured implements Tool {
         Path out = new Path(args[3]);
         FileInputFormat.setInputPaths(job, in);
         FileOutputFormat.setOutputPath(job, out);
-        
+
         job.setJobName("MyJob");
         job.setMapperClass(MapClass.class);
         job.setReducerClass(Reduce.class);
-        
+
         job.setInputFormat(TextInputFormat.class);
         job.setOutputFormat(TextOutputFormat.class);
         job.setMapOutputKeyClass(Text.class);
         job.setMapOutputValueClass(Text.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-        
+
         JobClient.runJob(job);
-        
+
         return 0;
     }
 
@@ -156,10 +156,10 @@ public class MyJob extends Configured implements Tool {
   			System.err.println("Caught exception..File not found");
   		}
   	}
-    
-    public static void main(String[] args) throws Exception { 
+
+    public static void main(String[] args) throws Exception {
         int res = ToolRunner.run(new Configuration(), new MyJob(), args);
-        
+
         System.exit(res);
     }
 }
